@@ -1,5 +1,3 @@
-Here is a professional README for your STM32 Drone Telemetry System. The formatting follows best academic and open-source standards, with clear sections, concise documentation, and no emoji or informal tone.
-
 ***
 
 # STM32 Drone Telemetry System with Real-Time OLED Display
