@@ -1,0 +1,401 @@
+================================================================================
+  STM32 DRONE TELEMETRY SYSTEM - HARDWARE SCHEMATIC
+================================================================================
+
+PROJECT: Real-Time Drone Telemetry Decoder with OLED Display and SD Logging
+DATE: October 27, 2025
+MICROCONTROLLER: STM32F401RE Nucleo Board
+CLOCK: 84 MHz (PLL from 8 MHz HSE)
+SUPPLY VOLTAGE: 3.3V (regulated onboard)
+
+================================================================================
+                        SYSTEM ARCHITECTURE DIAGRAM
+================================================================================
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                                                                     │
+    │  LAPTOP / PC                                                        │
+    │  (ArduPilot Drone Logs)                                            │
+    │         │                                                           │
+    │         └─→ Python Streamer (telemetry_streamer.py)               │
+    │             Port: COM3, Baud: 9600, Rate: 5 Hz                   │
+    │             │                                                       │
+    │             ↓                                                       │
+    │  ┌─────────────────────────────────────────────────────────────┐  │
+    │  │         USB-SERIAL ADAPTER (HW-558A / CP2102)              │  │
+    │  │  ┌─────────────────────────────────────────────────────┐   │  │
+    │  │  │ Pin 1: VCC (3.3V) → 3.3V Power Rail               │   │  │
+    │  │  │ Pin 2: GND        → Ground (Common)               │   │  │
+    │  │  │ Pin 3: TX         → STM32 PA10 (UART_RX, D2)      │   │  │
+    │  │  │ Pin 4: RX         → STM32 PA9  (UART_TX, D8)      │   │  │
+    │  │  └─────────────────────────────────────────────────────┘   │  │
+    │  └─────────────────────────────────────────────────────────────┘  │
+    │             │                                                      │
+    └─────────────┼──────────────────────────────────────────────────────┘
+                  │ [USB Cable]
+                  ↓
+    
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                                                                     │
+    │           STM32F401RE NUCLEO-F401RE MICROCONTROLLER               │
+    │                                                                     │
+    │  ┌─────────────────────────────────────────────────────────────┐  │
+    │  │  CORE: ARM Cortex-M4, 84 MHz                              │  │
+    │  │  FLASH: 256 KB (Program Memory)                           │  │
+    │  │  SRAM: 64 KB (Working Memory)                             │  │
+    │  │  SUPPLY: 3.3V (Regulated Onboard)                         │  │
+    │  └─────────────────────────────────────────────────────────────┘  │
+    │                                                                     │
+    │  ┌─────────────────────────────────────────────────────────────┐  │
+    │  │           PERIPHERAL CONFIGURATION                        │  │
+    │  ├─────────────────────────────────────────────────────────────┤  │
+    │  │                                                             │  │
+    │  │  1. USART1 (Serial Communication)                         │  │
+    │  │     ├─ PA9  (D8)  : USART1_TX → HW-558A RX              │  │
+    │  │     ├─ PA10 (D2)  : USART1_RX ← HW-558A TX              │  │
+    │  │     ├─ Baud Rate: 9600 bps                               │  │
+    │  │     ├─ Data Format: 8 bits, 1 stop, no parity           │  │
+    │  │     └─ Purpose: Receive telemetry CSV data              │  │
+    │  │                                                             │  │
+    │  │  2. I2C1 (OLED Display Control)                          │  │
+    │  │     ├─ PB8 (D15) : I2C1_SCL (100 kHz clock)            │  │
+    │  │     ├─ PB9 (D14) : I2C1_SDA (data line)                │  │
+    │  │     ├─ Device Address: 0x3C (SSD1306)                   │  │
+    │  │     ├─ Clock Speed: 100 kHz (Standard Mode)             │  │
+    │  │     └─ Purpose: Control 0.96\" OLED display            │  │
+    │  │                                                             │  │
+    │  │  3. SPI1 (SD Card Module Interface)                      │  │
+    │  │     ├─ PB3 (D3)  : SPI1_SCK    (Clock)                │  │
+    │  │     ├─ PB4 (D5)  : SPI1_MISO   (Data In)              │  │
+    │  │     ├─ PB5 (D4)  : SPI1_MOSI   (Data Out)             │  │
+    │  │     ├─ PB10 (D6) : GPIO Output (Chip Select)           │  │
+    │  │     ├─ Clock Speed: Init /256 (62.5 kHz), Data /2 (8 MHz) │  │
+    │  │     └─ Purpose: Read/Write microSD card                │  │
+    │  │                                                             │  │
+    │  │  4. System Clock (RCC)                                    │  │
+    │  │     ├─ External Crystal: 8 MHz (onboard)                │  │
+    │  │     ├─ PLL Multiplier: 336                              │  │
+    │  │     ├─ PLL Divider: 4                                   │  │
+    │  │     ├─ System Clock: 84 MHz                             │  │
+    │  │     └─ Purpose: All peripheral timing derived from this │  │
+    │  │                                                             │  │
+    │  └─────────────────────────────────────────────────────────────┘  │
+    │                                                                     │
+    │  ┌─────────────────────────────────────────────────────────────┐  │
+    │  │           POWER DISTRIBUTION                              │  │
+    │  ├─────────────────────────────────────────────────────────────┤  │
+    │  │                                                             │  │
+    │  │  3.3V Rail (Regulated Onboard)                           │  │
+    │  │  ├─ STM32F401RE Core: 50 mA                             │  │
+    │  │  ├─ OLED SSD1306: 20 mA                                 │  │
+    │  │  ├─ SD Card Module: 100 mA (peak)                       │  │
+    │  │  ├─ HW-558A (optional): 30 mA                           │  │
+    │  │  └─ Total (worst case): 200 mA                          │  │
+    │  │     Available from Nucleo regulator: 400 mA             │  │
+    │  │     → SAFE MARGIN: 200% ✓                              │  │
+    │  │                                                             │  │
+    │  │  GND (Common Ground)                                      │  │
+    │  │  └─ All devices share single GND connection             │  │
+    │  │                                                             │  │
+    │  └─────────────────────────────────────────────────────────────┘  │
+    │                                                                     │
+    │                         CONNECTIONS OUT                           │
+    │                                                                     │
+    └──────────┬──────────────────┬──────────────────┬──────────────────┘
+               │                  │                  │
+               ↓                  ↓                  ↓
+    ┌──────────────────┐ ┌────────────────┐ ┌──────────────────┐
+    │  OLED DISPLAY    │ │  SD CARD       │ │  USB-SERIAL      │
+    │  SSD1306 0.96"   │ │  MODULE (SPI)  │ │  ADAPTER         │
+    │  (I2C 0x3C)      │ │                │ │  (HW-558A)       │
+    │                  │ │  ↑ DATA IN/OUT │ │                  │
+    │  D2 (128×64)     │ │  ↑ CLOCK       │ │  ← TO LAPTOP     │
+    │  I2C Interface   │ │  ↑ CHIP SEL    │ │  ← TELEMETRY IN  │
+    │  Real-time       │ │                │ │  ← DISPLAY OUT   │
+    │  display of:     │ │  Persistent    │ │                  │
+    │  - Altitude      │ │  SD Card:      │ │  UART Bridge:    │
+    │  - Speed         │ │  - telemetry   │ │  - 9600 baud     │
+    │  - Voltage       │ │    .csv file   │ │  - CSV parsing   │
+    │  - SD Status     │ │  - Logging OK  │ │  - Data routing  │
+    │                  │ │    or FAIL     │ │                  │
+    └──────────────────┘ └────────────────┘ └──────────────────┘
+
+================================================================================
+                           SIGNAL FLOW DIAGRAM
+================================================================================
+
+UART Reception (5 Hz Telemetry):
+┌──────────────────────────────────────────────────────────────────────┐
+│ Input Line (from HW-558A):  "25.3,12.5,12.2\r\n"                    │
+│                                  ↓                                    │
+│ USART1 Reception (PA10):    HAL_UART_Receive(&huart1, ...)         │
+│                                  ↓                                    │
+│ RX Buffer:                  rx_buffer[] → Accumulate bytes          │
+│                                  ↓                                    │
+│ CSV Parsing (strtok):       altitude=25.3, speed=12.5, voltage=12.2 │
+│                                  ↓                                    │
+│ TelemetryData_t struct:     Store parsed values + timestamp          │
+│                                  ↓                                    │
+│ I2C1 Display Update:        ssd1306_WriteString() → OLED            │
+│                                  ↓                                    │
+│ SPI1 SD Logging:            f_write() → microSD card                 │
+└──────────────────────────────────────────────────────────────────────┘
+
+I2C Display Update (100 kHz):
+┌──────────────────────────────────────────────────────────────────────┐
+│ TelemetryData_t values                                               │
+│        ↓                                                              │
+│ Format with sprintf():                                               │
+│ "ALT: 25.30 m"                                                      │
+│ "SPD: 12.5 km/h"                                                    │
+│ "BAT: 12.200 V"                                                     │
+│ "LOGGING: OK/FAIL"                                                  │
+│        ↓                                                              │
+│ I2C Master (PB8/PB9) @ 100 kHz:                                    │
+│ ssd1306_SetCursor() → ssd1306_WriteString()                         │
+│        ↓                                                              │
+│ SSD1306 Controller:                                                 │
+│ 128×64 pixel buffer → OLED panel display                            │
+│        ↓                                                              │
+│ OLED Screen Output: Real-time telemetry visualization              │
+└──────────────────────────────────────────────────────────────────────┘
+
+SPI SD Card Operations (Up to 8 MHz):
+┌──────────────────────────────────────────────────────────────────────┐
+│ Initialization Phase:                                                │
+│ ├─ SPI Clock: /256 = 62.5 kHz (SD spec requirement)                │
+│ ├─ CMD0 (GO_IDLE_STATE)                                            │
+│ ├─ CMD8 (SEND_IF_COND)                                             │
+│ ├─ ACMD41 (SD_SEND_OP_COND) with HCS bit                           │
+│ ├─ CMD58 (READ_OCR) - check voltage & card type                    │
+│ └─ f_mount() - FatFS mount attempt                                 │
+│        ↓                                                              │
+│ Data Transfer Phase (if init successful):                           │
+│ ├─ SPI Clock: /2 = 8 MHz (high-speed operation)                   │
+│ ├─ CMD24 (WRITE_BLOCK) - write single sector                      │
+│ ├─ CMD25 (WRITE_MULTIPLE_BLOCK) - write multi sectors             │
+│ ├─ CMD17 (READ_SINGLE_BLOCK) - read single sector                 │
+│ ├─ CMD18 (READ_MULTIPLE_BLOCK) - read multi sectors               │
+│ └─ 512-byte blocks transferred via SPI                            │
+│        ↓                                                              │
+│ File System (FatFS):                                                │
+│ ├─ f_open() - open telemetry.csv                                  │
+│ ├─ f_write() - append CSV line with telemetry data                │
+│ ├─ f_sync() - flush to SD card                                    │
+│ └─ f_close() - close file after write                             │
+│        ↓                                                              │
+│ SD Card Storage:                                                    │
+│ telemetry.csv containing logged telemetry records                  │
+└──────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                        POWER BUDGET ANALYSIS
+================================================================================
+
+Component Power Consumption Summary:
+
+┌──────────────────────┬─────────┬─────────┬────────┬──────────────┐
+│ Component            │ Current │ Voltage │ Power  │ Status       │
+├──────────────────────┼─────────┼─────────┼────────┼──────────────┤
+│ STM32F401RE (84 MHz) │ 50 mA   │ 3.3V    │ 165 mW │ ✓ Normal     │
+│ OLED SSD1306 (Normal)│ 20 mA   │ 3.3V    │ 66 mW  │ ✓ Typical    │
+│ SD Card (Peak)       │ 100 mA  │ 3.3V    │ 330 mW │ ✓ During I/O │
+│ HW-558A (Optional)   │ 30 mA   │ 3.3V    │ 99 mW  │ ✓ Idle       │
+├──────────────────────┼─────────┼─────────┼────────┼──────────────┤
+│ TOTAL (Worst Case)   │ 200 mA  │ 3.3V    │ 660 mW │ ✓ Safe       │
+└──────────────────────┴─────────┴─────────┴────────┴──────────────┘
+
+Power Source Analysis:
+├─ Nucleo 3.3V Regulator Capacity: 400 mA
+├─ Safety Margin: (400 - 200) / 400 = 50% headroom
+├─ Reserve Capability: 200 mA available for expansion
+├─ Estimated Battery Life (1000 mAh): 5 hours continuous
+└─ ✓ SUFFICIENT FOR FIELD OPERATION
+
+================================================================================
+                        CONNECTOR DEFINITIONS
+================================================================================
+
+NUCLEO HEADER PINS (Arduino Compatible):
+
+Digital Pins (Top Row - CN7):
+  D0  → PD10 (Not used)
+  D1  → PD11 (Not used)
+  D2  → PA10 (UART1_RX) ← HW-558A TX
+  D3  → PB3  (SPI1_SCK) → SD Card CLK
+  D4  → PB5  (SPI1_MOSI)→ SD Card MOSI
+  D5  → PB4  (SPI1_MISO)← SD Card MISO
+  D6  → PB10 (GPIO Out) → SD Card CS
+  D7  → PC1  (Not used)
+  D8  → PA9  (UART1_TX) → HW-558A RX
+
+Digital Pins (Bottom Row - CN10):
+  D9  → PC0  (Not used)
+  D10 → PA5  (Not used)
+  D11 → PA4  (Not used)
+  D12 → PA3  (Not used)
+  D13 → PA2  (Not used)
+  D14 → PB9  (I2C1_SDA) → OLED SDA
+  D15 → PB8  (I2C1_SCL) → OLED SCL
+
+Analog Pins (CN8):
+  A0  → PA0  (Not used)
+  A1  → PA1  (Not used)
+  A2  → PA4  (Not used)
+  A3  → PB0  (Not used)
+  A4  → PC1  (Not used)
+  A5  → PC0  (Not used)
+
+Power Pins:
+  3.3V → STM32 3.3V regulated output
+  5V   → External 5V input (NOT used in this project)
+  GND  → Common ground (all modules)
+
+================================================================================
+                        COMPONENT PART NUMBERS
+================================================================================
+
+Core Components:
+├─ STM32 Nucleo-F401RE: NUCLEO-F401RE-P
+├─ SSD1306 OLED 0.96":   Generic (Alibaba/Robu)
+├─ SD Card Module:       Generic SPI Module
+├─ HW-558A CP2102:       Silicon Labs CP2102 (common USB-UART)
+├─ Breadboard:           830-hole solderless breadboard
+└─ Dupont Wires:         22 AWG Male-to-Male jumper wires
+
+Optional Components (for future enhancement):
+├─ Real-Time Clock:      DS3231
+├─ Temperature Sensor:   DHT22 or BME280
+├─ Bluetooth Module:     HC-05
+├─ 16x2 LCD Display:     1602A I2C variant
+└─ GPS Module:           NEO-6M
+
+================================================================================
+                        ELECTRICAL SPECIFICATIONS
+================================================================================
+
+System Voltage Levels:
+├─ STM32 Core Supply:    3.3V ± 5%
+├─ GPIO Logic Levels:    0V = LOW, 3.3V = HIGH
+├─ UART Levels:          RS-232 converted to 3.3V CMOS by HW-558A
+├─ I2C Logic Levels:     Open-drain, pulled to 3.3V
+├─ SPI Logic Levels:     CMOS 3.3V (no level shifters needed)
+└─ OLED Logic Levels:    3.3V I2C slave device
+
+Clock Specifications:
+├─ System Clock (SYSCLK):     84 MHz
+├─ AHB Bus Clock (HCLK):      84 MHz (AHB divider: 1)
+├─ APB1 Bus Clock (PCLK1):    42 MHz (APB1 divider: 2)
+├─ APB2 Bus Clock (PCLK2):    84 MHz (APB2 divider: 1)
+├─ UART1 Clock:               84 MHz (APB2)
+├─ I2C1 Clock:                42 MHz (APB1)
+├─ SPI1 Clock:                84 MHz (APB2)
+└─ Timer Clocks:              Various (84/42 MHz)
+
+Signal Integrity:
+├─ UART Baud Rate Accuracy:   ±1% (9600 baud verified)
+├─ I2C Clock Stability:       100 kHz ± 5% at room temperature
+├─ SPI Clock Frequency:       Prescaler-selectable (62.5 kHz to 21 MHz)
+├─ Max Cable Length (UART):   3-5 meters (breadboard to PC)
+├─ Max Cable Length (I2C):    1 meter (breadboard internal)
+├─ Max Cable Length (SPI):    1 meter (breadboard internal)
+└─ Recommended Wire Gauge:    22-24 AWG (0.64-0.51 mm²)
+
+================================================================================
+                        DEBUGGING & MONITORING
+================================================================================
+
+JTAG/SWD Interface (for debugger):
+├─ Protocol: ARM Cortex-M4 Serial Wire Debug (SWD)
+├─ Debugger: Onboard ST-LINK/V2 (included with Nucleo)
+├─ Debug Port Pins:
+│  ├─ PA13 (TMS/SWDIO) - Locked for debugging
+│  ├─ PA14 (TCK/SWCLK) - Locked for debugging
+│  └─ PB3 (SWO)       - Optional trace output
+└─ Usage: Step-through debugging, breakpoints, memory inspection
+
+UART Debug Port (optional):
+├─ Purpose: Print debug messages from firmware
+├─ Connection: USART2 (PA2/PA3) - available if needed
+├─ Baud Rate: 115200 (standard for debugging)
+└─ Usage: Serial monitor on PC to view debug output
+
+Real-Time Monitoring:
+├─ OLED Display: Real-time telemetry values shown live
+├─ Serial Monitor: CSV data reception can be captured
+├─ LED Indicators: None implemented (all resources used)
+└─ Status Feedback: "LOGGING: OK/FAIL" on display
+
+================================================================================
+                        THERMAL CONSIDERATIONS
+================================================================================
+
+Temperature Operating Range:
+├─ STM32F401RE Absolute Max: 125°C (junction)
+├─ STM32F401RE Rated Operating: -40°C to +85°C
+├─ Recommended Operating: 0°C to +50°C (field conditions)
+├─ SSD1306 OLED: -30°C to +70°C
+├─ SD Card Module: 0°C to +60°C
+└─ HW-558A: 0°C to +70°C
+
+Thermal Management (Current Design):
+├─ STM32F401RE Power Dissipation: ~0.5W (no heatsink needed)
+├─ Breadboard Ventilation: Passive (open air)
+├─ No thermal throttling expected at typical drone altitudes
+├─ Short mission duration (<1 hour) prevents thermal runaway
+└─ Enclosure Recommendation: Provide air gaps for heat dissipation
+
+================================================================================
+                        EMI/RFI CONSIDERATIONS
+================================================================================
+
+Noise Immunity:
+├─ UART: Twisted-pair recommended for >1m cable runs
+├─ I2C: Pull-up resistors (internal) at 3.3V, ~4.7kΩ
+├─ SPI: Keep clock and data lines away from high-frequency signals
+├─ Power: Decoupling capacitors on STM32 3.3V input (present on Nucleo)
+└─ Ground: Star-point grounding at breadboard power distribution
+
+Shielding:
+├─ USB cable: Standard shielded USB cable recommended
+├─ Breadboard wires: No shielding required for short runs
+├─ SD Card: Keep close to STM32 (short traces/wires)
+└─ OLED: Standard I2C ribbon acceptable for <1m distance
+
+Grounding:
+├─ All modules: Common ground via breadboard GND rail
+├─ STM32 GND pins: 2 pins minimum required (present)
+├─ Bypass capacitors: 100nF @ each power pin (implemented on Nucleo)
+└─ Return paths: Direct connection through breadboard rails
+
+================================================================================
+                        SAFETY CONSIDERATIONS
+================================================================================
+
+Electrical Safety:
+├─ Max Supply Voltage: 5V (Nucleo accepts USB 5V)
+├─ All signals: 3.3V CMOS logic (TTL safe)
+├─ Current Limiting: Built-in on all GPIO outputs
+├─ Short Circuit Protection: SD module has current limiting
+├─ USB Power: Protected by computer USB hub
+└─ Overcurrent: No external fuse needed for breadboard operation
+
+Operational Safety:
+├─ Vibration: Breadboard wiring may loosen if exposed to vibration
+├─ Moisture: Electronics should not be exposed to water/humidity
+├─ Temperature: Operating within 0-50°C for field use
+├─ Electrostatic Discharge (ESD): Handle carefully, use wrist strap if available
+└─ Mechanical: Ensure breadboard is secured during operation
+
+Software Safety:
+├─ Watchdog Timer: Not implemented (consider adding for reliability)
+├─ Null Pointer Checks: Present in telemetry parsing
+├─ Buffer Overflow Protection: rx_buffer size limited, bounds checked
+├─ Infinite Loop Protection: Main loop has HAL_Delay to prevent CPU hogging
+└─ SD Card Error Handling: graceful degradation if SD mount fails
+
+================================================================================
+
+END OF HARDWARE SCHEMATIC
+Last Updated: October 27, 2025
+Document Version: 1.0

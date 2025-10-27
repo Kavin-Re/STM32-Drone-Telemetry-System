@@ -1,0 +1,461 @@
+================================================================================
+  STM32 DRONE TELEMETRY SYSTEM - PINOUT DIAGRAM
+================================================================================
+
+PROJECT: Real-Time Drone Telemetry Decoder with OLED Display and SD Logging
+TARGET: STM32F401RE Nucleo-F401RE Development Board
+DATE: October 27, 2025
+PACKAGE: LQFP64 (100-pin Low-Profile Quad Flat Pack)
+
+================================================================================
+                        NUCLEO BOARD PIN LAYOUT (TOP VIEW)
+================================================================================
+
+                          CN7 (LEFT SIDE)
+                          
+                              ┌────────┐
+                          GND │        │ IOREF
+                         3V3+ │        │ RESET
+                         5V   │        │ 3V3+
+                         GND  │        │ 5V
+                         Vin  │        │ GND
+         PA2 (D13 - TX)  →    │ D0/PD10│
+         PA3 (D12 - RX)  ←    │ D1/PD11│
+         PA4 (D11 - PWM) ◄─ D2/PA10    │  (UART1_RX)
+         PB0 (D10 - PWM) ◄─ D3/PB3     │  (SPI1_SCK)
+         PC1 (D9 - PWM)  ◄─ D4/PB5     │  (SPI1_MOSI)
+         PC0 (D8)        ◄─ D5/PB4     │  (SPI1_MISO)
+         PD1 (D7)        ◄─ D6/PB10    │  (GPIO_OUT - SD_CS)
+         PD0 (D6)        ◄─ D7/PC1     │
+         PA9 (D8 - TX)   → D8/PA9      │  (UART1_TX)
+                             │        │
+                          ┌──┴────────┴──┐
+                          │  STM32       │
+                          │  F401RE      │
+                          │  (LQFP64)    │
+                          └──┬────────┬──┘
+                             │        │
+         PC0 (D9 - PWM)  ◄─ D9/PC0     │
+         PA5 (D10)       ◄─ D10/PA5    │  (NOT USED)
+         PA4 (D11)       ◄─ D11/PA4    │  (NOT USED)
+         PA3 (D12 - RX)  ←  D12/PA3    │  (NOT USED - USART2_RX)
+         PA2 (D13 - TX)  →  D13/PA2    │  (NOT USED - USART2_TX)
+         PB9 (D14-SDA)   → D14/PB9     │  (I2C1_SDA) ← OLED
+         PB8 (D15-SCL)   → D15/PB8     │  (I2C1_SCL) ← OLED
+                             │        │
+                          ┌──┴────────┴──┐
+                          │  NUCLEO      │
+                          │  (STM32)     │
+                          │  (Board)     │
+                          │              │
+                             CN10      
+                          
+================================================================================
+                        DETAILED PIN ASSIGNMENT TABLE
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     SIGNAL AND FUNCTION MAPPING                            │
+├──────────┬──────────┬────────────────┬─────────────┬──────────────────────┤
+│ Header   │ STM32Pin │ Function       │ Connection  │ Purpose/Status       │
+├──────────┼──────────┼────────────────┼─────────────┼──────────────────────┤
+│          │          │                │             │                      │
+│ POWER PINS (ALL AVAILABLE)                                                │
+│ 3.3V     │ VDDA/VREF│ 3.3V Rail      │ All Modules │ ✓ Power Distribution │
+│ GND      │ VSS      │ Ground (0V)    │ All Modules │ ✓ Common Return Path │
+│ 5V       │ USB 5V   │ (NOT USED)     │ -           │ - Not required       │
+│          │          │                │             │                      │
+│ USART1 INTERFACE (Serial Communication - 9600 BAUD)                       │
+│ D8       │ PA9      │ USART1_TX      │ HW-558A RX  │ ✓ Transmit to UART  │
+│ D2       │ PA10     │ USART1_RX      │ HW-558A TX  │ ✓ Receive from UART │
+│          │          │                │             │                      │
+│ I2C1 INTERFACE (OLED Display - 100 kHz)                                   │
+│ D15      │ PB8      │ I2C1_SCL       │ OLED SCL    │ ✓ Clock Signal       │
+│ D14      │ PB9      │ I2C1_SDA       │ OLED SDA    │ ✓ Data Signal        │
+│          │          │                │             │                      │
+│ SPI1 INTERFACE (SD Card Module)                                            │
+│ D3       │ PB3      │ SPI1_SCK       │ SD CLK      │ ✓ Serial Clock       │
+│ D4       │ PB5      │ SPI1_MOSI      │ SD MOSI     │ ✓ Master Out/Slave In│
+│ D5       │ PB4      │ SPI1_MISO      │ SD MISO     │ ✓ Master In/Slave Out│
+│ D6       │ PB10     │ GPIO_Output    │ SD CS       │ ✓ Chip Select        │
+│          │          │                │             │                      │
+│ UNUSED DIGITAL PINS (Available for future expansion)                       │
+│ D0       │ PD10     │ GPIO (General) │ -           │ - Not Connected      │
+│ D1       │ PD11     │ GPIO (General) │ -           │ - Not Connected      │
+│ D7       │ PC1      │ GPIO (General) │ -           │ - Not Connected      │
+│ D9       │ PC0      │ GPIO (General) │ -           │ - Not Connected      │
+│ D10      │ PA5      │ GPIO (General) │ -           │ - Not Connected      │
+│ D11      │ PA4      │ GPIO (General) │ -           │ - Not Connected      │
+│ D12      │ PA3      │ USART2_RX      │ -           │ - Not Used (Config)  │
+│ D13      │ PA2      │ USART2_TX      │ -           │ - Not Used (Config)  │
+│          │          │                │             │                      │
+│ ANALOG PINS (NOT USED - ALL AVAILABLE)                                    │
+│ A0       │ PA0      │ ADC_IN0        │ -           │ - Not Connected      │
+│ A1       │ PA1      │ ADC_IN1        │ -           │ - Not Connected      │
+│ A2       │ PA4      │ ADC_IN4        │ -           │ - Not Connected      │
+│ A3       │ PB0      │ ADC_IN8        │ -           │ - Not Connected      │
+│ A4       │ PC1      │ ADC_IN11       │ -           │ - Not Connected      │
+│ A5       │ PC0      │ ADC_IN10       │ -           │ - Not Connected      │
+│          │          │                │             │                      │
+│ DEBUG INTERFACE (ST-LINK Integrated)                                       │
+│ PA13     │ PA13     │ SYS_JTMS-SWDIO│ ST-LINK     │ ✓ Debug Port (Locked)│
+│ PA14     │ PA14     │ SYS_JTCK-SWCLK│ ST-LINK     │ ✓ Debug Port (Locked)│
+│ PB3      │ PB3      │ SYS_JTDO-SWO  │ ST-LINK     │ ✓ Debug Trace (Opt)  │
+│          │          │                │             │                      │
+│ CRYSTAL OSCILLATOR (Onboard)                                              │
+│ HSE      │ PH0/PH1  │ 8 MHz Crystal │ Onboard     │ ✓ External Clock     │
+│          │          │                │             │                      │
+│ MISC PINS                                                                   │
+│ NRST     │ NRST     │ Reset Button   │ Onboard     │ ✓ Manual Reset       │
+│ PC13     │ PC13     │ User Button    │ B1 (Blue)   │ ◄ Input (Optional)   │
+│          │          │                │             │                      │
+└──────────┴──────────┴────────────────┴─────────────┴──────────────────────┘
+
+================================================================================
+                     PERIPHERAL CLOCK TREE (84 MHz)
+================================================================================
+
+                           External HSE
+                              8 MHz
+                                │
+                                ↓
+                            ┌────────┐
+                            │  PLL   │ (Multiplier: 336, Divider: 4)
+                            └────┬───┘
+                                 ↓
+                            System Clock (SYSCLK)
+                               84 MHz
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ↓                       ↓                       ↓
+    AHB Divider             APB1 Divider           APB2 Divider
+      (÷1)                     (÷2)                    (÷1)
+        ↓                       ↓                       ↓
+    HCLK (84 MHz)         PCLK1 (42 MHz)         PCLK2 (84 MHz)
+        │                       │                       │
+    ┌───┴──────┐           ┌────┴────┐           ┌──────┴─────┐
+    │           │           │          │           │            │
+    ↓           ↓           ↓          ↓           ↓            ↓
+  STM32      Peripherals   UART2      I2C1       UART1         SPI1
+  Core       Busses        Timer      TIMER      Timer         GPIO
+  (CPU)      (GPIO,        (42 MHz)   (42 MHz)   (84 MHz)     (84 MHz)
+  84 MHz     Flash,etc)
+
+
+Clock Assignments for Project:
+├─ STM32F401RE Core: 84 MHz (max performance)
+├─ UART1 Baud Clock: 84 MHz (APB2) → 9600 bps achievable
+├─ I2C1 Timing Clock: 42 MHz (APB1) → 100 kHz I2C clock
+├─ SPI1 Source Clock: 84 MHz (APB2) → Prescaler selectable
+├─ Flash Wait States: 2 (required for 84 MHz @ 3.3V)
+├─ Prefetch Buffer: Enabled (performance optimization)
+└─ Cache: Not critical for this application
+
+================================================================================
+                        HEADER CONNECTOR LAYOUT (VISUAL)
+================================================================================
+
+                        CN7 (Left Column)              CN10 (Right Column)
+                        
+    ┌──────────────────────────────────────────────────────────────┐
+    │                                                              │
+    │            ↓↓↓ Pin Numbers Below ↓↓↓                         │
+    │                                                              │
+    │   TOP (Near USB)                                             │
+    │   ┌─────────────────────────────────────────────────────┐   │
+    │   │                                                     │   │
+    │  GND┤ ┌───────────────────────────────────────────────┐ ├GND │
+    │ 3.3V┤ │ STM32F401RE NUCLEO BOARD (Arduino-compatible)│ ├IOREF│
+    │  5V ┤ │ 84 MHz ARM Cortex-M4 Microcontroller        │ ├RESET│
+    │ GND ┤ │ 256KB Flash, 64KB RAM                        │ ├3.3V │
+    │ Vin ┤ │                                               │ ├5V   │
+    │     ├─┤ CN7 Connector (Left Side)    CN10 Connector│ ├GND  │
+    │     │ │ D0:PD10 (UART2)              (Right Side)   │ │     │
+    │ PA2 ├─┤ D1:PD11 (UART2)    ↔     D0:PD10 (GPIO)  │ │     │
+    │ PA3 ├─┤ D2:PA10 (UART1_RX) ← →    D1:PD11 (GPIO)  │ │     │
+    │ PA4 ├─┤ D3:PB3  (SPI1_SCK) ← →    D2:PA10 (✓RX)  ├─┤←PIN  │
+    │ PB0 ├─┤ D4:PB5  (SPI1_MOSI)← →    D3:PB3  (✓CLK) ├─┤     │
+    │ PC1 ├─┤ D5:PB4  (SPI1_MISO)← →    D4:PB5  (✓MOSI)├─┤     │
+    │ PD1 ├─┤ D6:PB10 (GPIO_CS)  ← →    D5:PB4  (✓MISO)├─┤     │
+    │ PD0 ├─┤ D7:PC1  (GPIO)      ← →    D6:PB10 (✓CS) ├─┤     │
+    │ PA9 ├─┤ D8:PA9  (UART1_TX) ← →    D7:PC1  (GPIO)  ├─┤UART1│
+    │     ├─┤ D9:PC0  (GPIO)      ← →    D8:PA9  (✓TX)  ├─┤TX   │
+    │     │ │ D10:PA5 (GPIO)      ← →    D9:PC0  (GPIO) │ │     │
+    │     │ │ D11:PA4 (GPIO)      ← →    D10:PA5 (GPIO) │ │     │
+    │     │ │ D12:PA3 (GPIO)      ← →    D11:PA4 (GPIO) │ │     │
+    │     │ │ D13:PA2 (GPIO)      ← →    D12:PA3 (GPIO) │ │     │
+    │     │ │ D14:PB9 (I2C1_SDA)  ← →    D13:PA2 (GPIO) │ │     │
+    │     │ │ D15:PB8 (I2C1_SCL)  ← →    D14:PB9 (✓SDA) ├─┤I2C1 │
+    │     │ │ A0:PA0  (ADC)       ← →    D15:PB8 (✓SCL) ├─┤SDA  │
+    │     │ │ A1:PA1  (ADC)       ← →    A0:PA0  (GPIO) │ │     │
+    │     │ │ A2:PA4  (ADC)       ← →    A1:PA1  (GPIO) │ │     │
+    │     │ │ A3:PB0  (ADC)       ← →    A2:PA4  (GPIO) │ │     │
+    │     │ │ A4:PC1  (ADC)       ← →    A3:PB0  (GPIO) │ │     │
+    │     │ │ A5:PC0  (ADC)       ← →    A4:PC1  (GPIO) │ │     │
+    │     │ │                             A5:PC0  (GPIO) │ │     │
+    │     │ │ ✓ = Used in this project               │ │     │
+    │     │ │ ← = Input to STM32  → = Output from STM32│ │     │
+    │     │ │ ◄  = Optional external control         │ │     │
+    │     └─┴─────────────────────────────────────────────┘ │     │
+    │     │                                                  │     │
+    │   BOTTOM (Near SD Card)                               │     │
+    │     └──────────────────────────────────────────────────┘     │
+    │                                                              │
+    └──────────────────────────────────────────────────────────────┘
+
+
+Connector Details:
+├─ CN7 (Left): 10 pins + 6 analog in = 16 pins total
+├─ CN10 (Right): 10 pins + 6 analog in = 16 pins total
+├─ Both connectors: Standard 2.54mm pitch Arduino headers
+├─ Material: Gold-plated for corrosion resistance
+├─ Insertion Force: ~50-60 grams per contact
+└─ Connector Life: >500 insertion cycles guaranteed
+
+================================================================================
+                     PERIPHERAL CONFIGURATION SUMMARY
+================================================================================
+
+UART1 (Serial Communication):
+├─ PA9  → UART1_TX (Transmit)        Alternate Function AF7
+├─ PA10 → UART1_RX (Receive)         Alternate Function AF7
+├─ Baud Rate: 9600 bps
+├─ Data Bits: 8
+├─ Stop Bits: 1
+├─ Parity: None
+├─ Flow Control: None
+├─ Clock Source: APB2 (84 MHz)
+├─ Actual Baud: 9600.00 (0% error)
+└─ Speed Grade: Standard (non-high-speed)
+
+I2C1 (OLED Display Control):
+├─ PB8  → I2C1_SCL (Clock)           Alternate Function AF4
+├─ PB9  → I2C1_SDA (Data)            Alternate Function AF4
+├─ Speed Mode: Standard (100 kHz)
+├─ Clock Source: APB1 (42 MHz)
+├─ Timing: 0x20404768 (auto-calculated)
+├─ Rise Time: ~1000 ns
+├─ Pull-up: Internal (STM32 GPIO)
+├─ Address Mode: 7-bit
+├─ Device Address: 0x3C (SSD1306 default)
+└─ DMA: Not enabled (not needed for display)
+
+SPI1 (SD Card Interface):
+├─ PB3  → SPI1_SCK (Clock)           Alternate Function AF5
+├─ PB4  → SPI1_MISO (Master In)      Alternate Function AF5
+├─ PB5  → SPI1_MOSI (Master Out)     Alternate Function AF5
+├─ PB10 → GPIO_Output (Chip Select)  GPIO Mode
+├─ Mode: Master Mode (STM32 is master, SD is slave)
+├─ Data Width: 8 bits per transfer
+├─ CPOL: 0 (Clock idle low)
+├─ CPHA: 0 (Sample on leading edge)
+├─ Clock Source: APB2 (84 MHz)
+├─ Prescaler: /256 for init, /2 for data transfer
+├─ Init Frequency: ~330 kHz (SD spec requirement)
+├─ Data Frequency: ~8 MHz (high-speed operation)
+├─ First Bit: MSB (Most Significant Bit first)
+├─ NSS Mode: Software (CS via GPIO)
+└─ DMA: Not enabled (not needed for this rate)
+
+GPIO1 (Chip Select):
+├─ PB10 → GPIO_Output (Push-Pull)    GPIO Mode
+├─ Default State: HIGH (Inactive)
+├─ Output Type: Push-Pull (strong drive)
+├─ Speed: Low (SD doesn't need high speed)
+├─ Pull-up/Down: None (active output)
+├─ Init State: SET (HIGH) via HAL_GPIO_WritePin
+└─ Controlled by: Firmware in user_diskio.c (SD_CS_LOW/HIGH macros)
+
+================================================================================
+                        ELECTRICAL CHARACTERISTICS
+================================================================================
+
+GPIO Output Specifications (All Digital Pins):
+├─ Output High Voltage (VOH): 3.0V min @ 20mA sink
+├─ Output Low Voltage (VOL): 0.3V max @ 20mA source
+├─ Output Drive Strength: 20mA per pin (GPIO)
+├─ Total GPIO Sink Current: 120mA (all pins combined)
+├─ Total GPIO Source Current: 120mA (all pins combined)
+├─ Propagation Delay: ~3-5ns (GPIO output to pin)
+└─ Slew Rate: ~5V/ns (without slew rate control)
+
+Input Specifications (GPIO Inputs):
+├─ Input Logic Threshold: VIL=1.2V, VIH=2.1V (TTL-compatible)
+├─ Pull-up Resistance: 25-50kΩ (internal, if enabled)
+├─ Pull-down Resistance: 25-50kΩ (internal, if enabled)
+├─ Input Capacitance: ~10pF (typical)
+├─ Hysteresis: ~200mV (built-in schmitt trigger)
+└─ Maximum Input Voltage: 5.5V (5V tolerant)
+
+UART Specifications:
+├─ TX Output Voltage: 3.3V CMOS (converted to RS-232 via CP2102)
+├─ RX Input Voltage: 3.3V CMOS level
+├─ Maximum Baud Rate: 3 Mbps (hardware capable, 9600 used)
+├─ Bit Time: 104.17 µs @ 9600 baud
+├─ Start Bit Setup Time: 1 bit period
+├─ Data Bits: 8 (5-8 configurable)
+└─ Stop Bit Setup Time: 1 bit period
+
+I2C Specifications:
+├─ Bus Voltage: 3.3V (pulled to rail via resistors)
+├─ Clock Frequency: 100 kHz ± 5% (Standard Mode)
+├─ SCL Output Type: Open-Drain (needs pull-up)
+├─ SDA Output Type: Open-Drain (needs pull-up)
+├─ Minimum Clock Pulse Width: ~5 µs (100 kHz)
+├─ Maximum Bit Time: 10 µs (100 kHz)
+├─ Start Condition Setup: 4.7 µs hold time
+├─ Stop Condition Setup: 4.0 µs hold time
+├─ Data Setup Time: 250ns (minimum)
+└─ Data Hold Time: 0ns (setup-time dominant)
+
+SPI Specifications (Master Mode):
+├─ Clock Frequency: 62.5 kHz (init) to 8 MHz (data transfer)
+├─ Clock Duty Cycle: 50%
+├─ MOSI Output Voltage: 3.3V CMOS
+├─ MISO Input Voltage: 3.3V CMOS
+├─ SCK Phase (CPHA): 0 (data captured on leading edge)
+├─ SCK Polarity (CPOL): 0 (clock idles low)
+├─ Bit Duration: ~125 ns @ 8 MHz
+├─ Setup Time: ~30ns (before clock edge)
+├─ Hold Time: ~30ns (after clock edge)
+├─ CS Minimum Inactive Time: ~1 µs (between transactions)
+└─ Frame Size: 8 bits per transfer (no auto-padding)
+
+Temperature Coefficient:
+├─ Baud Rate Drift: ~0.01%/°C (frequency stable)
+├─ I2C Clock Drift: ~0.05%/°C (PLL-stable)
+├─ SPI Clock Drift: ~0.05%/°C (APB2-stable)
+└─ Voltage Reference Drift: ~0.1%/°C (VDDA)
+
+================================================================================
+                        DEVICE ADDRESS MAP (I2C)
+================================================================================
+
+I2C Device Addresses (7-bit addressing):
+
+┌────────────────┬──────────────┬────────────────┬──────────────┐
+│ Device         │ Address (7b) │ Address (8b)   │ Status       │
+├────────────────┼──────────────┼────────────────┼──────────────┤
+│ SSD1306 OLED   │ 0x3C         │ 0x78 (Write)   │ ✓ Used       │
+│                │              │ 0x79 (Read)    │              │
+│ (Alternate)    │ 0x3D         │ 0x7A (Write)   │ - Unused     │
+│                │              │ 0x7B (Read)    │              │
+│                │              │                │              │
+│ Reserved       │ 0x00         │ Reserved       │ - System     │
+│ General Call   │ 0x00 (write) │ 0x00           │ - Broadcast  │
+│ CBUS Address   │ 0x01         │ -              │ - Unused     │
+│                │              │                │              │
+└────────────────┴──────────────┴────────────────┴──────────────┘
+
+I2C Bus Scan Results (Expected when running i2c_scan code):
+├─ Address 0x3C: Found "SSD1306 OLED Display"
+└─ All other addresses: Not found (no other I2C devices present)
+
+I2C Data Frame Structure (SSD1306 Write Command):
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬───────┬─────────┐
+│START│ A6  │ A5  │ A4  │ A3  │ A2  │ A1  │ A0  │ R/W=0 │ Address │
+├─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴───────┴─────────┤
+│ 0   │ 1   │ 1   │ 1   │ 1   │ 0   │ 0   │ C   │ D/C   │ Byte    │
+├─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴───────┴─────────┤
+│ SSD1306 Slave Address (0x3C)        │ Command/Data│ Payload     │
+└─────────────────────────────────────┴─────────────┴─────────────┘
+
+Where:
+  C (Control Bit) = 0 for commands, 1 for data
+  D/C (Data/Command) = Data byte or command byte
+
+================================================================================
+                        SPI TRANSACTION FORMAT (SD CARD)
+================================================================================
+
+SPI Frame Structure (8-bit):
+┌──┬──┬──┬──┬──┬──┬──┬──┐
+│7 │6 │5 │4 │3 │2 │1 │0 │ ← Bit Position (MSB first)
+├──┼──┼──┼──┼──┼──┼──┼──┤
+│  │  │  │  │  │  │  │  │ ← Data (MSB sent first)
+└──┴──┴──┴──┴──┴──┴──┴──┘
+
+SD Card Command Format (6 bytes):
+┌────┬────────────────────────────────────────────────┬──────────┐
+│ CMD│ ARG (4 bytes - 32 bits)                        │ CRC (1b) │
+├────┬──┬──────────────────────────────────────────────┼──────────┤
+│Byte│0 │1          │2         │3         │4          │5         │
+├────┼──┼──────────────────────────────────────────────┼──────────┤
+│Bits│47│46-32      │31-24     │23-16     │15-8       │7-1   │0 │
+├────┼──┼──────────────────────────────────────────────┼──────────┤
+│Data│01│Command    │Argument (MSB first)              │CRC7 │End│
+│    │  │(6 bits)   │                                 │     │Bit│
+└────┴──┴──────────────────────────────────────────────┴──────────┘
+
+Example: CMD0 (GO_IDLE_STATE)
+├─ Byte 0: 0x40 (01 000000) = CMD0
+├─ Bytes 1-4: 0x00 0x00 0x00 0x00 (no arguments)
+├─ Byte 5: 0x95 (10010101) = CRC + end bit
+└─ Total: 6 bytes transmitted
+
+SD Card Response Format (R1):
+┌───┬───┬───┬───┬───┬───┬───┬───┐
+│7  │6  │5  │4  │3  │2  │1  │0 │
+├───┼───┼───┼───┼───┼───┼───┼───┤
+│Bit│ Meaning                    │
+├───┼──────────────────────────────┤
+│7  │ Start Bit (always 0)        │
+│6  │ Parameter Error             │
+│5  │ Address Error               │
+│4  │ CRC Error                   │
+│3  │ Illegal Command             │
+│2  │ Erase Sequence Error        │
+│1  │ SPI Mode Error              │
+│0  │ Idle State (1=idle, 0=busy) │
+└───┴──────────────────────────────┘
+
+Example: R1 Response 0x01
+├─ Bit 0: 1 (Idle)
+├─ Bit 1-6: 0 (No errors)
+├─ Bit 7: 0 (Start bit)
+└─ Interpretation: SD card is ready
+
+================================================================================
+                        CONNECTOR PIN CROSS-REFERENCE
+================================================================================
+
+Nucleo Header → STM32 Pin → Project Function:
+
+CN7 Connections:
+  D0  → PD10  (Not Used)
+  D1  → PD11  (Not Used)
+  D2  → PA10  (UART1_RX) ← Receives telemetry from HW-558A
+  D3  → PB3   (SPI1_SCK) → Serial Clock to SD Card
+  D4  → PB5   (SPI1_MOSI)→ Master Out to SD Card
+  D5  → PB4   (SPI1_MISO)← Master In from SD Card
+  D6  → PB10  (GPIO_OUT) → Chip Select to SD Card
+  D7  → PC1   (Not Used)
+  D8  → PA9   (UART1_TX) → Transmit to HW-558A
+
+CN10 Connections:
+  D9  → PC0   (Not Used)
+  D10 → PA5   (Not Used)
+  D11 → PA4   (Not Used)
+  D12 → PA3   (Not Used)
+  D13 → PA2   (Not Used)
+  D14 → PB9   (I2C1_SDA) → Data line to OLED
+  D15 → PB8   (I2C1_SCL) → Clock line to OLED
+
+Analog Pins (All Unused):
+  A0  → PA0
+  A1  → PA1
+  A2  → PA4
+  A3  → PB0
+  A4  → PC1
+  A5  → PC0
+
+Debug/Special Pins (ST-LINK Controlled):
+  PA13 (TMS/SWDIO) → Debug interface
+  PA14 (TCK/SWCLK) → Debug interface
+  PB3 (SWO) → Debug trace output (optional)
+
+================================================================================
+
+END OF PINOUT DIAGRAM
+Last Updated: October 27, 2025
+Document Version: 1.0

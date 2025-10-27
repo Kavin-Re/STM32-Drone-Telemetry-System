@@ -1,0 +1,46 @@
+# Build outputs
+*.o
+*.a
+*.so
+*.elf
+*.bin
+*.hex
+*.map
+
+# STM32CubeIDE
+Debug/
+Release/
+*.make
+*.elf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.o
+*.obj
+*.lib
+*.a
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
