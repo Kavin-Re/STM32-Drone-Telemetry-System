@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # STM32 Drone Telemetry System with Real-Time OLED Display
 
 Real-time embedded telemetry decoder for ArduPilot drone logs using STM32F401RE microcontroller.
@@ -87,3 +88,7 @@ GitHub: https://github.com/Kavin-Re
 ---
 
 *Submitted as Mini-Project to [Your University], October 2025*
+=======
+# STM32-Drone-Telemetry-System
+Real-time drone telemetry decoder with OLED display and SD card logging using STM32F401RE microcontroller
+>>>>>>> b93725920853d119dbb3e5cabea05267271a8d99
