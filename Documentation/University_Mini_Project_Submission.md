@@ -1,29 +1,26 @@
 # STM32 Drone Telemetry Decoder with Real-Time OLED Display and SD Logging
 ## Mini-Project Report for University Submission
 
-**Student Name:** [Your Name]  
-**Roll Number:** [Your Roll Number]  
+**Student Name:** [Kavin.K.K]
 **Department:** Electronics Engineering  
-**University:** [Your University]  
+**University:** Rashtriya Raksha University
 **Academic Year:** 2024-2025 (Semester III)  
-**Project Duration:** October 25-27, 2025 (3 days)  
-**Internship Organization:** Trinnovate Synergy Technologies, Coimbatore  
 **Date of Submission:** October 27, 2025  
 **Status:** Fully Functional | Ready for Deployment
 
 ---
 
-## 📋 Executive Summary
+## Executive Summary
 
 This mini-project presents a **real-time embedded telemetry system** designed to decode and display drone flight data using an **STM32F401RE microcontroller** integrated with an **SSD1306 OLED display**, **SD card module**, and **serial communication interface**. The system successfully receives telemetry data from an **ArduPilot drone log** via UART, parses CSV-formatted telemetry records in real-time, displays critical flight metrics (altitude, speed, battery voltage) on a 0.96" OLED screen at 5 Hz update rate, and logs data to microSD card storage using FatFS filesystem.
 
 **Project Achievements:**
-- ✅ **100% functional UART-to-OLED pipeline** with real drone flight data
-- ✅ **Multi-protocol integration** (USART1, I2C1, SPI1 working simultaneously)
-- ✅ **Professional embedded systems development** using STM32 HAL and STM32CubeIDE
-- ✅ **End-to-end data pipeline** from ArduPilot logs through Python processing to embedded display
-- ✅ **Comprehensive firmware** (~600 lines of production-quality C code)
-- ✅ **Complete technical documentation** with schematics, pinouts, and testing results
+-  **100% functional UART-to-OLED pipeline** with real drone flight data
+-  **Multi-protocol integration** (USART1, I2C1, SPI1 working simultaneously)
+-  **Professional embedded systems development** using STM32 HAL and STM32CubeIDE
+-  **End-to-end data pipeline** from ArduPilot logs through Python processing to embedded display
+-  **Comprehensive firmware** (~600 lines of production-quality C code)
+-  **Complete technical documentation** with schematics, pinouts, and testing results
 
 ---
 
@@ -66,47 +63,47 @@ Drone pilots and researchers require real-time access to flight telemetry data (
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    SYSTEM ARCHITECTURE                       │
+│                    SYSTEM ARCHITECTURE                      │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  PC/Laptop                                                   │
+│                                                             │
+│  PC/Laptop                                                  │
 │  (ArduPilot .bin logs) → Python Streamer (COM3, 9600 baud)  │
-│         │                                                    │
+│         │                                                   │
 │         └─→ [USB-Serial Bridge: HW-558A/CP2102]             │
-│              │                                               │
-│              └─→ UART1 (PA9/PA10)                            │
-│                  │                                           │
-│  ┌───────────────┴─────────────────────────────────────┐    │
-│  │                                                      │    │
-│  │    STM32F401RE Nucleo-F401RE (Central MCU)         │    │
-│  │    84 MHz, 256KB Flash, 64KB RAM                    │    │
-│  │                                                      │    │
-│  │    ┌─────────────────────────────────────┐          │    │
-│  │    │ UART1 (PA9/PA10)                    │          │    │
-│  │    │ → Telemetry Reception (9600 baud)  │          │    │
-│  │    └─────────┬──────────────────────────┘          │    │
-│  │              │                                       │    │
-│  │    ┌─────────┴──────────────────────────┐          │    │
-│  │    │ CSV Parser (Altitude/Speed/Voltage)│          │    │
-│  │    └─────────┬──────────────────────────┘          │    │
-│  │              │                                       │    │
-│  │    ┌─────────┴────────────┐    ┌─────────────┐    │    │
-│  │    │                      │    │             │    │    │
-│  │    ↓                      ↓    ↓             ↓    │    │
-│  │  I2C1 (PB8/PB9)        SPI1 (PB3/4/5)    GPIO   │    │
-│  │  [OLED Display]        [SD Card Module]  [CS]   │    │
-│  │                                                   │    │
-│  └───────────────┬──────────────┬──────────────────┘    │
-│                  │              │                       │
-│                  ↓              ↓                       │
-│    ┌──────────────────┐  ┌─────────────────┐          │
-│    │  OLED SSD1306    │  │  SD Card Module │          │
-│    │  (I2C 0x3C)      │  │  (SPI 10 MHz)   │          │
-│    │  Real-Time       │  │  Persistent     │          │
-│    │  Display         │  │  Logging        │          │
-│    └──────────────────┘  └─────────────────┘          │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+│              │                                              │
+│              └─→ UART1 (PA9/PA10)                           │
+│                  │                                          │
+│  ┌───────────────┴─────────────────────────────────┐        │
+│  │                                                 │        │
+│  │    STM32F401RE Nucleo-F401RE (Central MCU)      │        │
+│  │    84 MHz, 256KB Flash, 64KB RAM                │        │
+│  │                                                 │        │
+│  │    ┌────────────────────────────────────┐       │        │
+│  │    │ UART1 (PA9/PA10)                   │       │        │
+│  │    │ → Telemetry Reception (9600 baud)  │       │        │
+│  │    └─────────┬──────────────────────────┘       │        │
+│  │              │                                  │        │
+│  │    ┌─────────┴──────────────────────────┐       │        │
+│  │    │ CSV Parser (Altitude/Speed/Voltage)│       │        │
+│  │    └─────────┬──────────────────────────┘       │        │
+│  │              │                                  │        │
+│  │    ┌─────────┴────────────┐    ┌─────────────┐  │        │
+│  │    │                      │    │             │  │        │
+│  │    ↓                      ↓    ↓             ↓  │        │
+│  │  I2C1 (PB8/PB9)        SPI1 (PB3/4/5)    GPIO   │        │
+│  │  [OLED Display]        [SD Card Module]  [CS]   │        │
+│  │                                                 │        │
+│  └───────────────┬──────────────┬──────────────────┘        │
+│                  │              │                           │
+│                  ↓              ↓                           │
+│    ┌──────────────────┐  ┌─────────────────┐                │
+│    │  OLED SSD1306    │  │  SD Card Module │                │
+│    │  (I2C 0x3C)      │  │  (SPI 10 MHz)   │                │
+│    │  Real-Time       │  │  Persistent     │                │
+│    │  Display         │  │  Logging        │                │
+│    └──────────────────┘  └─────────────────┘                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### 2.2 Pin Assignment Table
@@ -145,7 +142,7 @@ Drone pilots and researchers require real-time access to flight telemetry data (
 | HW-558A (optional) | 30 | 3.3V | 99 |
 | **Total** | **200 mA** | **3.3V** | **660 mW** |
 
-**Nucleo 3.3V Regulator Capacity:** 400 mA → **Safety Margin: 200%** ✅
+**Nucleo 3.3V Regulator Capacity:** 400 mA → **Safety Margin: 200%** 
 
 ---
 
@@ -342,11 +339,11 @@ Result: telemetry_stream.csv ready for streaming
 - Baud rate: 9600 (8N1)
 
 **Test Cases:**
-| **Input** | **Expected Parse** | **Actual Result** | **Status** |
-|---|---|---|---|
-| `25.3,12.5,12.2\n` | alt=25.3, spd=12.5, V=12.2 | Exact match | ✅ Pass |
-| `0.5,2.3,12.6\n` | alt=0.5, spd=2.3, V=12.6 | Exact match | ✅ Pass |
-| `100.0,45.7,11.5\n` | alt=100.0, spd=45.7, V=11.5 | Exact match | ✅ Pass |
+| **Input**           | **Expected Parse**          | **Actual Result** | **Status** |
+|---------------------|-----------------------------|-------------------|------------|
+| `25.3,12.5,12.2\n`  | alt=25.3, spd=12.5, V=12.2  | Exact match       |  Pass      |
+| `0.5,2.3,12.6\n`    | alt=0.5, spd=2.3, V=12.6    | Exact match       |  Pass      |
+| `100.0,45.7,11.5\n` | alt=100.0, spd=45.7, V=11.5 | Exact match       |  Pass      |
 
 **Result:** **100% parse accuracy** over 50 test vectors
 
@@ -368,13 +365,13 @@ Result: telemetry_stream.csv ready for streaming
 ```
 
 **Measurements:**
-- Refresh latency: ~50 ms (target: <100 ms) ✅
-- Text clarity: Full resolution ✅
-- Update stability: No flicker ✅
+- Refresh latency: ~50 ms (target: <100 ms) 
+- Text clarity: Full resolution 
+- Update stability: No flicker 
 
 #### Test 3: CSV Data Logging
 
-**Status:** ⚠️ In debug phase
+**Status:**  In debug phase
 
 **Current Issue:**
 ```
@@ -396,16 +393,16 @@ CSV File: telemetry.csv
 
 ### 4.3 Performance Metrics
 
-| **Metric** | **Target** | **Achieved** | **Status** |
-|---|---|---|---|
-| UART Baud Rate | 9600 ± 1% | 9600 | ✅ |
-| Update Rate | 1-5 Hz | 5 Hz | ✅ |
-| OLED Latency | < 100 ms | ~50 ms | ✅ |
-| CSV Parse Accuracy | 100% | 100% | ✅ |
-| Memory Usage (Flash) | < 256 KB | ~45 KB | ✅ |
-| Memory Usage (RAM) | < 64 KB | ~3 KB | ✅ |
-| System Clock | 84 MHz | 84 MHz | ✅ |
-| I2C Clock | 100 kHz ± 5% | 100 kHz | ✅ |
+| **Metric**           | **Target**   | **Achieved** |
+|----------------------|--------------|--------------|
+| UART Baud Rate       | 9600 ± 1%    | 9600         | 
+| Update Rate          | 1-5 Hz       | 5 Hz         | 
+| OLED Latency         | < 100 ms     | ~50 ms       |
+| CSV Parse Accuracy   | 100%         | 100%         | 
+| Memory Usage (Flash) | < 256 KB     | ~45 KB       |
+| Memory Usage (RAM)   | < 64 KB      | ~3 KB        | 
+| System Clock         | 84 MHz       | 84 MHz       | 
+| I2C Clock            | 100 kHz ± 5% | 100 kHz      | 
 
 ---
 
@@ -580,16 +577,16 @@ f_mount() returns error code 1 (FR_DISK_ERR)
 This mini-project successfully demonstrates **professional embedded systems development** through the design, implementation, and testing of a **multi-protocol telemetry system**. The core functionality—receiving drone flight data via UART, parsing in real-time, and displaying on OLED—is fully operational and validated with actual ArduPilot flight data.
 
 **Key Achievements:**
-1. ✅ **Hardware integration:** UART, I2C, SPI working simultaneously on single microcontroller
-2. ✅ **Real-time performance:** 5 Hz telemetry update rate with <100ms latency
-3. ✅ **Professional code:** 600+ lines of well-commented, modular C firmware
-4. ✅ **Data pipeline:** Complete workflow from drone logs to embedded display
-5. ✅ **Systematic debugging:** Documented problem-solution pairs for 4 major challenges
+1.  **Hardware integration:** UART, I2C, SPI working simultaneously on single microcontroller
+2.  **Real-time performance:** 5 Hz telemetry update rate with <100ms latency
+3.  **Professional code:** 600+ lines of well-commented, modular C firmware
+4.  **Data pipeline:** Complete workflow from drone logs to embedded display
+5.  **Systematic debugging:** Documented problem-solution pairs for 4 major challenges
 
 **System Status:**
-- **Fully Functional:** UART reception + I2C OLED display ✅
-- **Operational:** Real-time telemetry visualization with actual drone data ✅
-- **Debug Phase:** SD card FatFS integration (non-critical feature) ⚠️
+- **Fully Functional:** UART reception + I2C OLED display 
+- **Operational:** Real-time telemetry visualization with actual drone data 
+- **Debug Phase:** SD card FatFS integration (non-critical feature) 
 
 **Recommendations:**
 The system is ready for deployment as a **standalone telemetry display** or **proof-of-concept for embedded data acquisition systems**. With the pending SD card debugging (1-2 hours), the system will achieve **100% planned functionality**.
@@ -657,21 +654,18 @@ This project provides a strong foundation for future work in embedded systems, I
 
 ### Appendix C: Testing Results Summary
 
-**UART Communication:** 100% parse accuracy ✅  
-**OLED Display:** <100ms latency, stable refresh ✅  
-**System Clock:** 84 MHz confirmed ✅  
-**Memory Usage:** 45 KB flash, 3 KB RAM ✅  
-**I2C Clock:** 100 kHz ± 5% tolerance ✅  
-**SD Card:** Debug phase - pending FatFS resolution ⚠️
+**UART Communication:** 100% parse accuracy 
+**OLED Display:** <100ms latency, stable refresh 
+**System Clock:** 84 MHz confirmed   
+**Memory Usage:** 45 KB flash, 3 KB RAM   
+**I2C Clock:** 100 kHz ± 5% tolerance 
+**SD Card:** Debug phase - pending FatFS resolution 
 
 **Full test vectors and results provided in technical report**
 
 ---
 
-**Project Submission Status:** COMPLETE AND READY FOR EVALUATION
-
-**Prepared by:** [Your Name]  
+**Prepared by:** Kavin.K.K
 **Date:** October 27, 2025, 04:00 AM IST  
-**Reviewed by:** [Supervisor Name]  
-**Status:** Approved for University Submission ✅
+
 

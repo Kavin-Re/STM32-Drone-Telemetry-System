@@ -6,7 +6,7 @@ import csv
 import sys
 
 # --- Configuration ---
-# ⚠️ Ensure this port matches the Silicon Labs CP210x port (COM3)
+#  Ensure this port matches the Silicon Labs CP210x port (COM3)
 SERIAL_PORT = 'COM3' 
 BAUD_RATE = 9600
 DATA_FILE = 'telemetry_stream.csv'
@@ -21,12 +21,12 @@ def stream_telemetry():
     try:
         # 1. Initialize Serial Connection
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-        print(f"✅ Opened serial port {SERIAL_PORT} at {BAUD_RATE} baud.")
-        print(f"🚀 Starting telemetry stream from {DATA_FILE} at {UPDATE_RATE_HZ} Hz...")
+        print(f" Opened serial port {SERIAL_PORT} at {BAUD_RATE} baud.")
+        print(f" Starting telemetry stream from {DATA_FILE} at {UPDATE_RATE_HZ} Hz...")
         time.sleep(1) # Wait for serial port to stabilize
         
     except serial.SerialException as e:
-        print(f"❌ Error: Could not open serial port {SERIAL_PORT}.")
+        print(f" Error: Could not open serial port {SERIAL_PORT}.")
         print(f"   Details: {e}")
         print("   Check if the USB-TTL adapter is connected and drivers are installed.")
         sys.exit(1)
@@ -58,14 +58,14 @@ def stream_telemetry():
                 time.sleep(DELAY_TIME)
                 
     except FileNotFoundError:
-        print(f"❌ Error: Data file '{DATA_FILE}' not found.")
+        print(f" Error: Data file '{DATA_FILE}' not found.")
         print("   Ensure the streamer is run from the same folder as the CSV file.")
         
     except KeyboardInterrupt:
-        print("\n🛑 Stream interrupted by user.")
+        print("\n Stream interrupted by user.")
         
     except Exception as e:
-        print(f"\n❌ An unexpected error occurred during streaming: {e}")
+        print(f"\n An unexpected error occurred during streaming: {e}")
 
     finally:
         if 'ser' in locals() and ser.is_open:

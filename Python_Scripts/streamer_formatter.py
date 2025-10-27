@@ -34,9 +34,9 @@ try:
     # Write the final, stream-ready CSV
     df_stream.to_csv(OUTPUT_FILE, index=False, header=False)
 
-    print(f"✅ Successfully created {OUTPUT_FILE} with {len(df_stream)} rows.")
+    print(f" Successfully created {OUTPUT_FILE} with {len(df_stream)} rows.")
     
 except FileNotFoundError:
-    print(f"❌ Error: {INPUT_FILE} not found. Ensure the mavlog2csv command ran successfully.")
+    print(f" Error: {INPUT_FILE} not found. Ensure the mavlog2csv command ran successfully.")
 except Exception as e:
-    print(f"❌ An unexpected error occurred during formatting: {e}")
+    print(f" An unexpected error occurred during formatting: {e}")

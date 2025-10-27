@@ -1,3 +1,7 @@
+Below is your README text **with all emojis removed**, making it cleaner and more professional for academic and open-source use.
+
+***
+
 # STM32 Drone Telemetry System - Source Code Package
 ## Complete Firmware and Data Pipeline Implementation
 
@@ -6,29 +10,29 @@
 **Date:** October 27, 2025  
 **Status:** Core Functionality Operational | SD Debug Phase
 
----
+***
 
-## 📁 Package Contents
+## Package Contents
 
 ```
 STM32_Telemetry_System/
 ├── Firmware/
-│   ├── main.c                     (Core application logic)
-│   ├── user_diskio.c              (SD card SPI driver for FatFS)
-│   └── STM32 Telemetry.ioc        (Hardware configuration file)
+│   ├── main.c                 (Core application logic)
+│   ├── user_diskio.c           (SD card SPI driver for FatFS)
+│   └── STM32 Telemetry.ioc     (Hardware configuration file)
 ├── Python_Scripts/
-│   ├── telemetry_streamer.py      (Serial data sender script)
-│   └── streamer_formatter.py      (ArduPilot log processor)
+│   ├── telemetry_streamer.py   (Serial data sender script)
+│   └── streamer_formatter.py   (ArduPilot log processor)
 ├── Documentation/
-│   ├── Project_Report.md          (Complete technical report)
-│   ├── Hardware_Schematic.pdf     (Pin mapping and wiring)
-│   └── Testing_Results.txt        (Validation logs)
-└── README.md                      (This file)
+│   ├── Project_Report.md       (Complete technical report)
+│   ├── Hardware_Schematic.pdf  (Pin mapping and wiring)
+│   └── Testing_Results.txt     (Validation logs)
+└── README.md                   (This file)
 ```
 
----
+***
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 
@@ -45,9 +49,9 @@ STM32_Telemetry_System/
 - Python 3.8+ with pyserial library
 - ArduPilot mavlogdump.py tool (optional, for log processing)
 
----
+***
 
-## 📋 Installation Steps
+## Installation Steps
 
 ### Part 1: Firmware Deployment
 
@@ -56,7 +60,6 @@ STM32_Telemetry_System/
    File → Open Projects from File System
    Select: STM32_Telemetry_System/Firmware/
    ```
-
 2. **Verify Configuration:**
    - Double-click `STM32 Telemetry.ioc` to view pin assignments
    - Confirm peripherals match your hardware:
@@ -64,12 +67,10 @@ STM32_Telemetry_System/
      - I2C1: PB8 (SCL), PB9 (SDA) @ 100 kHz
      - SPI1: PB3 (CLK), PB4 (MISO), PB5 (MOSI) @ Prescaler /2
      - GPIO: PB10 (SD CS)
-
 3. **Build Firmware:**
    ```
    Project → Build Project (Ctrl+B)
    ```
-
 4. **Flash to Board:**
    ```
    Run → Debug As → STM32 Cortex-M C/C++ Application (F11)
@@ -81,24 +82,21 @@ STM32_Telemetry_System/
    ```bash
    pip install pyserial
    ```
-
 2. **Identify COM Port:**
    - Windows: Check Device Manager → Ports (COM & LPT)
    - Linux/Mac: Check `/dev/ttyUSB*` or `/dev/tty.usbserial*`
-
 3. **Update COM Port in Script:**
    ```python
    # telemetry_streamer.py, Line 12
    SERIAL_PORT = 'COM3'  # Change to your actual port
    ```
-
 4. **Prepare Test Data:**
    - Place `telemetry_stream.csv` in same directory as script
    - Format: `Altitude(m),Speed(km/h),Voltage(V)\n`
 
----
+***
 
-## 🔧 Firmware Architecture
+## Firmware Architecture
 
 ### 1. Main Application Flow (`main.c`)
 
@@ -207,9 +205,9 @@ void Telemetry_Log(TelemetryData_t *data) {
 }
 ```
 
----
+***
 
-## 💾 SD Card Driver Implementation (`user_diskio.c`)
+## SD Card Driver Implementation (`user_diskio.c`)
 
 ### Key Features
 
@@ -256,9 +254,9 @@ DSTATUS USER_initialize(BYTE pdrv) {
 }
 ```
 
----
+***
 
-## 🐍 Python Data Pipeline
+## Python Data Pipeline
 
 ### Script 1: `telemetry_streamer.py`
 
@@ -277,8 +275,8 @@ python telemetry_streamer.py
 
 **Expected Output:**
 ```
-✅ Opened serial port COM3 at 9600 baud.
-🚀 Starting telemetry stream from telemetry_stream.csv at 5.0 Hz...
+Opened serial port COM3 at 9600 baud.
+Starting telemetry stream from telemetry_stream.csv at 5.0 Hz...
 [0] Sent: 0.5,2.3,12.6
 [1] Sent: 1.0,2.5,12.5
 [2] Sent: 1.5,3.2,12.4
@@ -296,9 +294,9 @@ python telemetry_streamer.py
 4. Merge staggered data rows
 5. Output clean `telemetry_stream.csv`
 
----
+***
 
-## 🧪 Testing and Validation
+## Testing and Validation
 
 ### Test Case 1: UART Communication
 
@@ -314,7 +312,7 @@ sprintf(debug, "Parsed: %.2f,%.1f,%.3f\n", altitude, speed, voltage);
 HAL_UART_Transmit(&huart1, (uint8_t*)debug, strlen(debug), 100);
 ```
 
-**Result:** ✅ 100% parse accuracy confirmed
+**Result:** 100% parse accuracy confirmed
 
 ### Test Case 2: OLED Display
 
@@ -330,11 +328,11 @@ BAT: 12.200 V
 LOGGING: OK
 ```
 
-**Result:** ✅ Display updates in ~50ms (well under 100ms target)
+**Result:** Display updates in ~50ms (well under 100ms target)
 
 ### Test Case 3: SD Card Logging
 
-**Status:** ⚠️ Debugging in progress
+**Status:** Debugging in progress
 
 **Current Issue:**
 ```
@@ -347,9 +345,9 @@ LOGGING: OK
 3. Add serial debug output to track FatFS errors
 4. Test with known-good SD card
 
----
+***
 
-## 🔧 Troubleshooting Guide
+## Troubleshooting Guide
 
 ### Issue 1: "LOGGING: FAIL" on OLED
 
@@ -411,34 +409,34 @@ MCU GCC Linker → Miscellaneous → Add:
 -u _printf_float
 ```
 
----
+***
 
-## 📈 Performance Metrics
+## Performance Metrics
 
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| **UART Baud Rate** | 9600 bps | 9600 bps | ✅ |
-| **Update Rate** | 1-5 Hz | 5 Hz | ✅ |
-| **OLED Refresh** | < 100 ms | ~50 ms | ✅ |
-| **CSV Parse Accuracy** | 100% | 100% | ✅ |
-| **Memory Usage (Flash)** | < 256 KB | ~45 KB | ✅ |
-| **Memory Usage (RAM)** | < 64 KB | ~3 KB | ✅ |
-| **SD Logging** | Operational | Debug phase | ⚠️ |
+| Metric                  | Target     | Actual    | Status   |
+|-------------------------|------------|-----------|----------|
+| UART Baud Rate          | 9600 bps   | 9600 bps  | Yes      |
+| Update Rate             | 1-5 Hz     | 5 Hz      | Yes      |
+| OLED Refresh            | < 100 ms   | ~50 ms    | Yes      |
+| CSV Parse Accuracy      | 100%       | 100%      | Yes      |
+| Memory Usage (Flash)    | < 256 KB   | ~45 KB    | Yes      |
+| Memory Usage (RAM)      | < 64 KB    | ~3 KB     | Yes      |
+| SD Logging              | Operational| Debug phase| Partial  |
 
----
+***
 
-## 🔬 Code Quality Metrics
+## Code Quality Metrics
 
-- **Total Lines of Code:** ~600 (main.c + user_diskio.c)
-- **Function Count:** 12 major functions
-- **Cyclomatic Complexity:** Low (avg 3-5 per function)
-- **Comment Density:** 25% (well-documented)
-- **Compiler Warnings:** 0
-- **Code Reusability:** High (modular design)
+- Total Lines of Code: ~600 (main.c + user_diskio.c)
+- Function Count: 12 major functions
+- Cyclomatic Complexity: Low (avg 3-5 per function)
+- Comment Density: 25% (well-documented)
+- Compiler Warnings: 0
+- Code Reusability: High (modular design)
 
----
+***
 
-## 🎯 Future Enhancements
+## Future Enhancements
 
 ### Phase 1: SD Card Completion (1 hour)
 - [ ] Finalize SD initialization debugging
@@ -460,28 +458,28 @@ MCU GCC Linker → Miscellaneous → Add:
 - [ ] Implement live PC monitoring dashboard
 - [ ] Mobile app integration (Android/iOS)
 
----
+***
 
-## 📚 References and Dependencies
+## References and Dependencies
 
 ### Hardware Datasheets
-- STM32F401RE: [https://www.st.com/resource/en/datasheet/stm32f401re.pdf](https://www.st.com/resource/en/datasheet/stm32f401re.pdf)
-- SSD1306 OLED: [https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf](https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf)
-- CP2102 USB-UART: [https://www.silabs.com/documents/public/data-sheets/CP2102-9.pdf](https://www.silabs.com/documents/public/data-sheets/CP2102-9.pdf)
+- STM32F401RE: https://www.st.com/resource/en/datasheet/stm32f401re.pdf
+- SSD1306 OLED: https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf
+- CP2102 USB-UART: https://www.silabs.com/documents/public/data-sheets/CP2102-9.pdf
 
 ### Software Libraries
 - STM32 HAL Library: Included in STM32CubeF4 V1.28.3
-- FatFS: [http://elm-chan.org/fsw/ff/](http://elm-chan.org/fsw/ff/)
-- SSD1306 Driver: [https://github.com/afiskon/stm32-ssd1306](https://github.com/afiskon/stm32-ssd1306)
-- PySerial: [https://pyserial.readthedocs.io/](https://pyserial.readthedocs.io/)
+- FatFS: http://elm-chan.org/fsw/ff/
+- SSD1306 Driver: https://github.com/afiskon/stm32-ssd1306
+- PySerial: https://pyserial.readthedocs.io/
 
 ### Tools
-- STM32CubeIDE: [https://www.st.com/en/development-tools/stm32cubeide.html](https://www.st.com/en/development-tools/stm32cubeide.html)
-- ArduPilot Tools: [https://github.com/ArduPilot/pymavlink](https://github.com/ArduPilot/pymavlink)
+- STM32CubeIDE: https://www.st.com/en/development-tools/stm32cubeide.html
+- ArduPilot Tools: https://github.com/ArduPilot/pymavlink
 
----
+***
 
-## 👤 Author and Contact
+## Author and Contact
 
 **Project Lead:** Electronics Engineering Student  
 **Institution:** Trinnovate Synergy Technologies (Research Internship)  
@@ -491,38 +489,40 @@ MCU GCC Linker → Miscellaneous → Add:
 **Project Repository:** [Internal - Trinnovate Synergy]  
 **Documentation:** Complete technical report available in `Documentation/Project_Report.md`
 
----
+***
 
-## 📝 License and Usage
+## License and Usage
 
-This code is developed for educational and research purposes as part of an internship project. 
+This code is developed for educational and research purposes as part of an internship project.
 
 **Usage Terms:**
-- ✅ Educational use and learning
-- ✅ Personal non-commercial projects
-- ✅ Reference for similar embedded systems
-- ❌ Commercial use without permission
-- ❌ Reproduction without attribution
+- Educational use and learning
+- Personal non-commercial projects
+- Reference for similar embedded systems
+- Commercial use without permission
+- Reproduction without attribution
 
 **Attribution:**
 If you use or reference this code, please cite:
 ```
 STM32 Drone Telemetry Decoder System
-Trinnovate Synergy Technologies, October 2025
-Electronics Engineering Internship Project
+Kavin.K.K, October 2025
+Electronics Engineering MINI Project
 ```
 
----
+***
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- **Trinnovate Synergy Technologies** for internship opportunity and hardware support
-- **STMicroelectronics** for comprehensive HAL documentation
-- **ArduPilot Community** for mavlogdump.py tool and log format specifications
-- **Open Source Community** for SSD1306 and FatFS libraries
+- STMicroelectronics for comprehensive HAL documentation
+- ArduPilot Community for mavlogdump.py tool and log format specifications
+- Open Source Community for SSD1306 and FatFS libraries
 
----
+***
 
 **Last Updated:** October 27, 2025  
 **Version:** 1.0 (Core Functional Release)  
 **Status:** Production-Ready (UART/I2C) | SD Debug Phase
+
+***
+
